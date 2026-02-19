@@ -1,0 +1,23 @@
+fastapi
+pydantic-settings
+uvicorn[standard]
+sqlalchemy
+databases[aiosqlite]
+python-dotenv
+rich
+asgi-correlation-id
+python-json-logger
+logtail-python
+python-jose
+python-multipart
+# Note: passlib and bcrypt are required for password hashing. The version of bcrypt is specified to ensure compatibility with passlib.
+passlib[bcrypt]
+bcrypt==4.0.1
+httpx
+# aiofiles is required for handling file uploads in FastAPI. It allows for asynchronous file operations, which can improve performance when dealing with large files or multiple concurrent uploads.
+aiofiles
+b2sdk
+sentry-sdk[fastapi]
+psycopg2-binary #should use psycopg2 in production
+databases[asyncpg]
+alembic
