@@ -95,3 +95,18 @@ You click the "Merge" button on the website.
 # Tutorials on Building using docker with github actions
 # Build CI/CD Pipeline with GitHub Actions | Docker Image to DockerHub
 https://www.youtube.com/watch?v=MRBzHJaDRqA
+
+
+# Merge the traditional way
+
+## Switch to main
+git checkout main
+
+## Pull Latest Changes
+git pull origin main
+
+## Merge Your Branch
+git merge <branch-name>
+
+## Push to Remote
+git push origin main
