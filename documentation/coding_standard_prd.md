@@ -68,6 +68,68 @@ class UserPostIn(BaseModel):
 
 ```
 
+Project-specific examples (from this repo)
+-----------------------------------------
+Below are the concrete `Post` DB model and `UserPostIn` Pydantic schema taken from the codebase to illustrate the project's conventions.
+
+`Post` model (excerpt from `blogapi/database.py`):
+
+```py
+class Post(Base):
+    __tablename__ = "posts"
+
+    id: Mapped[UUID] = mapped_column(
+        UUID(as_uuid=True), primary_key=True, default=uuid.uuid4
+    )
+    author_id: Mapped[UUID] = mapped_column(
+        UUID(as_uuid=True),
+        sqlalchemy.ForeignKey("users.id", ondelete="CASCADE"),
+        nullable=False,
+    )
+    category_id: Mapped[Optional[UUID]] = mapped_column(
+        UUID(as_uuid=True), sqlalchemy.ForeignKey("categories.id", ondelete="SET NULL")
+    )
+    title: Mapped[str] = mapped_column(Text, nullable=False)
+    slug: Mapped[str] = mapped_column(Text, nullable=False, unique=True)
+    content: Mapped[Optional[str]] = mapped_column(Text)
+    excerpt: Mapped[Optional[str]] = mapped_column(Text)
+    status: Mapped[str] = mapped_column(
+        String(20), nullable=False, server_default="draft"
+    )
+    published_at: Mapped[Optional[datetime]] = mapped_column(sqlalchemy.DateTime)
+    metadata: Mapped[Optional[dict]] = mapped_column(JSONB)
+    search: Mapped[Optional[str]] = mapped_column(
+        TSVECTOR,
+        sqlalchemy.Computed(
+            "to_tsvector('english', coalesce(title,'') || ' ' || coalesce(content,'') || ' ' || coalesce(excerpt,''))",
+            persisted=True,
+        ),
+    )
+    created_at: Mapped[datetime] = mapped_column(
+        sqlalchemy.DateTime, server_default=func.now(), nullable=False
+    )
+    updated_at: Mapped[Optional[datetime]] = mapped_column(
+        sqlalchemy.DateTime, onupdate=func.now()
+    )
+    deleted_at: Mapped[Optional[datetime]] = mapped_column(sqlalchemy.DateTime)
+
+```
+
+`UserPostIn` schema (excerpt from `blogapi/models/schemas.py`):
+
+```py
+class UserPostIn(BaseModel):
+    title: str = Field(..., example="My first post")
+    content: Optional[str] = Field(None, example="Post body markdown/html")
+    excerpt: Optional[str] = Field(None, example="Short summary")
+    slug: Optional[str] = Field(None, example="my-first-post")
+    category_id: Optional[UUID] = None
+    metadata: Optional[dict] = None
+    status: Optional[str] = Field(None, example="draft")
+    author_id: UUID
+
+```
+
 Async DB usage
 --------------
 - Use `AsyncEngine` and `AsyncSession` everywhere; create sessions via dependency injection in routers.
